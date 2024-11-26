@@ -43,6 +43,9 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+        if kk_rct.colliderect(bb_rct):
+            print("ゲームオーバー")
+            return
         screen.blit(bg_img, [0, 0]) 
 
         key_lst = pg.key.get_pressed()
@@ -68,7 +71,6 @@ def main():
             vx *= -1
         elif check_bound(bb_rct)[1] != True:
             vy *= -1
-        bb_rct.move_ip(vx, vy)
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)
         pg.display.update()
