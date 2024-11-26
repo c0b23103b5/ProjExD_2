@@ -28,22 +28,23 @@ def gameover(screen: pg.Surface) -> None:
     """
     ゲームオーバー時の画面表示
     """
+    #画面の初期化
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
-
+    #画面全体の黒透かし
     overlay = pg.Surface((WIDTH, HEIGHT),pg.SRCALPHA)
     overlay.fill((0,0,0,150))
     screen.blit(overlay, (0, 0))
-
+    #文字読み込み
     fonto = pg.font.Font(None,80)
     txt = fonto.render("Game Over",True,(255,255,255))
-
+    #こうかとん読み込み
     go_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 1.4)
     go_rct1 = go_img.get_rect()
     go_rct2 = go_img.get_rect()
     go_rct1.center = 300, 325
     go_rct2.center = 800, 325
-
+    #全体の表示
     screen.blit(bg_img, [0, 0]) 
     screen.blit(overlay, (0, 0))
     screen.blit(txt, (400,300))
@@ -51,6 +52,20 @@ def gameover(screen: pg.Surface) -> None:
     screen.blit(go_img, go_rct2)
     pg.display.update()
     time.sleep(5)
+
+
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    """
+    時間とともに爆弾が拡大し、加速する
+    """
+    bb_imgs = [] #拡大された爆弾のリスト
+    accs = [a for a in range(1, 11)] #加速度のリスト
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)    
+    return bb_imgs, accs
 
 
 def main():
@@ -78,7 +93,7 @@ def main():
             gameover(screen)
             return
         screen.blit(bg_img, [0, 0]) 
-
+        #方向キーの入力に合わせたこうかとんの移動変更
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]       
         DELTA = {
@@ -96,7 +111,11 @@ def main():
         #こうかとんが画面外なら元の場所にどす
         if check_bound(kk_rct) != (True,True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
-        bb_rct.move_ip(vx, vy)
+        #加速度とサイズ変更の反映
+        bb_imgs, bb_accs = init_bb_imgs()
+        avx = vx*bb_accs[min(tmr//500, 9)]
+        bb_img = bb_imgs[min(tmr//500, 9)]
+        bb_rct.move_ip(avx, vy)
         #爆弾が画面外なら反対方向に移動させる
         if check_bound(bb_rct)[0] != True:
             vx *= -1
