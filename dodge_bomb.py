@@ -68,6 +68,31 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     return bb_imgs, accs
 
 
+def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
+    """
+    移動量の合計値のタプルに対応する向きの画像Surfaaceを返す
+    """
+    roto0 = {
+        (0,-5):90,
+        (5,-5):45,
+        (5,0):0,
+        (5,5):-45,
+        (0,5):-90,
+    }
+    roto1 = {
+        (0,0):0,
+        (-5,0):0,
+        (-5,-5):135,
+        (-5,5):-45
+    }
+    if sum_mv in roto1:
+        R_kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), roto1[sum_mv], 0.9)
+    else:
+        r_kk_img = pg.transform.flip(pg.image.load("fig/3.png"), True, False)
+        R_kk_img = pg.transform.rotozoom(r_kk_img, roto0[sum_mv], 0.9)
+    return R_kk_img
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -105,7 +130,10 @@ def main():
         for key, tpl in DELTA.items():
             if key_lst[key]:
                 sum_mv[0] += tpl[0]
-                sum_mv[1] += tpl[1]   
+                sum_mv[1] += tpl[1]
+
+        kk_img = get_kk_img((0, 0))
+        kk_img = get_kk_img(tuple(sum_mv))   
         
         kk_rct.move_ip(sum_mv)
         #こうかとんが画面外なら元の場所にどす
