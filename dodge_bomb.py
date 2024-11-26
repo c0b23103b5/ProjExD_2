@@ -9,6 +9,20 @@ WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
+def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
+    """
+    引数で与えられたRectが画面の中か外かを判定する
+    引数：こうかとんRect,爆弾Rect
+    画面内ならTrue、画面外ならFalseを返す
+    """
+    w, h = True, True
+    if rct.left < 0 or WIDTH < rct.right:
+        w = False
+    if rct.top < 0 or HEIGHT < rct.bottom:
+        h = False
+    return w, h
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -42,9 +56,18 @@ def main():
         for key, tpl in DELTA.items():
             if key_lst[key]:
                 sum_mv[0] += tpl[0]
-                sum_mv[1] += tpl[1]     
+                sum_mv[1] += tpl[1]   
         
         kk_rct.move_ip(sum_mv)
+        #こうかとんが画面外なら元の場所にどす
+        if check_bound(kk_rct) != (True,True):
+            kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
+        bb_rct.move_ip(vx, vy)
+        #爆弾が画面外なら反対方向に移動させる
+        if check_bound(bb_rct)[0] != True:
+            vx *= -1
+        elif check_bound(bb_rct)[1] != True:
+            vy *= -1
         bb_rct.move_ip(vx, vy)
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)
