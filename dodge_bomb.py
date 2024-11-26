@@ -57,6 +57,7 @@ def gameover(screen: pg.Surface) -> None:
 def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     """
     時間とともに爆弾が拡大し、加速する
+    戻り値：拡大された爆弾のリスト,加速度のリスト
     """
     bb_imgs = [] #拡大された爆弾のリスト
     accs = [a for a in range(1, 11)] #加速度のリスト
@@ -82,8 +83,8 @@ def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
     roto1 = {
         (0,0):0,
         (-5,0):0,
-        (-5,-5):135,
-        (-5,5):-45
+        (-5,-5):-225,
+        (-5,5):225
     }
     if sum_mv in roto1:
         R_kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), roto1[sum_mv], 0.9)
