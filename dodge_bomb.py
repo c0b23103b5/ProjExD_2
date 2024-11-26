@@ -2,6 +2,7 @@ import os
 from random import randint
 import sys
 import pygame as pg
+import time
 
 
 
@@ -21,6 +22,35 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     if rct.top < 0 or HEIGHT < rct.bottom:
         h = False
     return w, h
+
+
+def gameover(screen: pg.Surface) -> None:
+    """
+    ゲームオーバー時の画面表示
+    """
+    screen = pg.display.set_mode((WIDTH, HEIGHT))
+    bg_img = pg.image.load("fig/pg_bg.jpg")    
+
+    overlay = pg.Surface((WIDTH, HEIGHT),pg.SRCALPHA)
+    overlay.fill((0,0,0,150))
+    screen.blit(overlay, (0, 0))
+
+    fonto = pg.font.Font(None,80)
+    txt = fonto.render("Game Over",True,(255,255,255))
+
+    go_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 1.4)
+    go_rct1 = go_img.get_rect()
+    go_rct2 = go_img.get_rect()
+    go_rct1.center = 300, 325
+    go_rct2.center = 800, 325
+
+    screen.blit(bg_img, [0, 0]) 
+    screen.blit(overlay, (0, 0))
+    screen.blit(txt, (400,300))
+    screen.blit(go_img, go_rct1)
+    screen.blit(go_img, go_rct2)
+    pg.display.update()
+    time.sleep(5)
 
 
 def main():
@@ -45,6 +75,7 @@ def main():
                 return
         if kk_rct.colliderect(bb_rct):
             print("ゲームオーバー")
+            gameover(screen)
             return
         screen.blit(bg_img, [0, 0]) 
 
